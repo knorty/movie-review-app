@@ -1,21 +1,25 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { fetchMovies } from "../api/tmdb";
 
 interface Movie {
     id: number;
     title: string;
-    poster: string;
-    rating: number;
+    poster_path: string;
+    vote_average: number;
 }
 
-// Sample movie data (Replace with API later)
-const movies: Movie[] = [
-    { id: 1, title: "Inception", poster: "https://via.placeholder.com/150", rating: 8.8 },
-    { id: 2, title: "Interstellar", poster: "https://via.placeholder.com/150", rating: 8.6 },
-    { id: 3, title: "The Dark Knight", poster: "https://via.placeholder.com/150", rating: 9.0 },
-    { id: 4, title: "Dune", poster: "https://via.placeholder.com/150", rating: 8.3 },
-];
-
 const Movies: React.FC = () => {
+    const [movies, setMovies] = useState<Movie[]>([]);
+
+    useEffect(() => {
+        const loadMovies = async () => {
+            const data = await fetchMovies();
+            setMovies(data);
+        };
+        loadMovies();
+    }, []);
+
     return (
         <div className="container mx-auto p-6">
             <h1 className="text-3xl font-bold mb-6">Movies</h1>
@@ -26,10 +30,14 @@ const Movies: React.FC = () => {
                         to={`/movies/${movie.id}`}
                         className="bg-white shadow-md rounded-lg overflow-hidden transform transition hover:scale-105"
                     >
-                        <img src={movie.poster} alt={movie.title} className="w-full h-64 object-cover" />
+                        <img
+                            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                            alt={movie.title}
+                            className="w-full h-64 object-cover"
+                        />
                         <div className="p-4">
                             <h2 className="text-lg font-semibold">{movie.title}</h2>
-                            <p className="text-gray-600">⭐ {movie.rating}</p>
+                            <p className="text-gray-600">⭐ {movie.vote_average.toFixed(1)}</p>
                         </div>
                     </Link>
                 ))}
@@ -39,3 +47,4 @@ const Movies: React.FC = () => {
 };
 
 export default Movies;
+
