@@ -12,24 +12,26 @@ interface Movie {
 const Movies: React.FC = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
-        const loadMovies = async () => {
-            const data = await fetchMovies();
-            setMovies(data);
-        };
         loadMovies();
-    }, []);
+    }, [page]);
+
+    const loadMovies = async () => {
+        const data = searchTerm
+            ? await searchMovies(searchTerm, page)
+            : await fetchMovies(page);
+
+        setMovies(data.results);
+        setTotalPages(data.total_pages);
+    };
 
     const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
-        if (event.target.value.trim() === "") {
-            const data = await fetchMovies();
-            setMovies(data);
-        } else {
-            const data = await searchMovies(event.target.value);
-            setMovies(data);
-        }
+        setPage(1); // Reset to first page when searching
+        loadMovies();
     };
 
     return (
@@ -65,10 +67,32 @@ const Movies: React.FC = () => {
                     </Link>
                 ))}
             </div>
+
+            {/* Pagination Controls */}
+            <div className="flex justify-center items-center mt-6 space-x-4">
+                <button
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                    className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
+                >
+                    ← Previous
+                </button>
+
+                <span className="text-lg font-semibold">{page} / {totalPages}</span>
+
+                <button
+                    disabled={page >= totalPages}
+                    onClick={() => setPage(page + 1)}
+                    className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
+                >
+                    Next →
+                </button>
+            </div>
         </div>
     );
 };
 
 export default Movies;
+
 
 
