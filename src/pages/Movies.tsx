@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchMovies } from "../api/tmdb";
+import { fetchMovies, searchMovies } from "../api/tmdb";
 
 interface Movie {
     id: number;
@@ -11,6 +11,7 @@ interface Movie {
 
 const Movies: React.FC = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         const loadMovies = async () => {
@@ -20,9 +21,31 @@ const Movies: React.FC = () => {
         loadMovies();
     }, []);
 
+    const handleSearch = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+        if (event.target.value.trim() === "") {
+            const data = await fetchMovies();
+            setMovies(data);
+        } else {
+            const data = await searchMovies(event.target.value);
+            setMovies(data);
+        }
+    };
+
     return (
         <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6">Movies</h1>
+            <h1 className="text-3xl font-bold mb-4">Movies</h1>
+
+            {/* Search Bar */}
+            <input
+                type="text"
+                placeholder="Search for a movie..."
+                value={searchTerm}
+                onChange={handleSearch}
+                className="w-full p-2 mb-6 border border-gray-300 rounded-md"
+            />
+
+            {/* Movies Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {movies.map((movie) => (
                     <Link
@@ -47,4 +70,5 @@ const Movies: React.FC = () => {
 };
 
 export default Movies;
+
 

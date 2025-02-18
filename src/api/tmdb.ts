@@ -22,3 +22,14 @@ export const fetchMovieDetails = async (movieId: string) => {
         return null;
     }
 };
+
+export const searchMovies = async (query: string) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${query}`);
+        return response.data.results;
+    } catch (error) {
+        console.error("Error searching movies:", error);
+        return [];
+    }
+};
+
