@@ -8,7 +8,10 @@ interface Movie {
     poster_path: string;
     vote_average: number;
     overview: string;
-}
+};
+
+const { movieId } = useParams<{ movieId: string }>();
+console.log("Movie ID:", movieId); // Debugging log
 
 const MovieDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -50,5 +53,3 @@ const MovieDetails: React.FC = () => {
 };
 
 export default MovieDetails;
-
-
